@@ -5,9 +5,14 @@ import execa from "execa";
  *
  * @param ref the sha, branchname, etc to fetch
  * @param pwd the root of the git repository
+ * @param depth the number of commits to fetch
  */
-export async function fetch(ref: string, pwd: string) {
-  const { exitCode } = await git("fetch", ["origin", ref], pwd);
+export async function fetch(ref: string, pwd: string, depth: number) {
+  const { exitCode } = await git(
+    "fetch",
+    [`--depth=${depth}`, "origin", ref],
+    pwd
+  );
   if (exitCode !== 0) {
     throw new Error(
       `'git fetch origin ${ref}' failed with exit code ${exitCode}`

@@ -65,8 +65,8 @@ export class Backport {
         return; // nothing left to do here
       }
 
-      await git.fetch(baseref, this.config.pwd);
-      await git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd);
+      await git.fetch(baseref, this.config.pwd, 1000);
+      await git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd, 1000);
 
       for (const label of labels) {
         console.log(`Working on label ${label.name}`);
@@ -92,7 +92,7 @@ export class Backport {
         const target = match[1];
         console.log(`Found target in label: ${target}`);
 
-        await git.fetch(target, this.config.pwd);
+        await git.fetch(target, this.config.pwd, 1);
 
         try {
           const branchname = `backport-${pull_number}-to-${target}`;
