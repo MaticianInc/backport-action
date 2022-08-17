@@ -101,9 +101,14 @@ describe("the backport action", () => {
         await backport.run();
         expect(mockedGit.fetch).toHaveBeenCalledWith(
           "refs/pull/1347/head",
-          config.pwd
+          config.pwd,
+          1000
         );
-        expect(mockedGit.fetch).toHaveBeenCalledWith("stable/0.25", config.pwd);
+        expect(mockedGit.fetch).toHaveBeenCalledWith(
+          "stable/0.25",
+          config.pwd,
+          1
+        );
       });
       it("pushes the commits to origin", async () => {
         mockedGit.push.mockResolvedValue(0);
