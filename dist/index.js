@@ -313,7 +313,7 @@ exports.push = push;
 function git(command, args, pwd) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`git ${args.join(" ")}`);
+        console.log(`git ${command} ${args.join(" ")}`);
         const child = (0, execa_1.default)("git", [command, ...args], {
             cwd: pwd,
             env: {
