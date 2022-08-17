@@ -79,8 +79,8 @@ class Backport {
                     console.log(`Nothing to backport: none of the labels match the backport pattern '${this.config.labels.pattern.source}'`);
                     return; // nothing left to do here
                 }
-                yield git.fetch(baseref, this.config.pwd);
-                yield git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd);
+                yield git.fetch(baseref, this.config.pwd, 1000);
+                yield git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd, 1000);
                 for (const label of labels) {
                     console.log(`Working on label ${label.name}`);
                     // we are looking for labels like "backport stable/0.24"
@@ -99,7 +99,7 @@ class Backport {
                     //extract the target branch (e.g. "stable/0.24")
                     const target = match[1];
                     console.log(`Found target in label: ${target}`);
-                    yield git.fetch(target, this.config.pwd);
+                    yield git.fetch(target, this.config.pwd, 1);
                     try {
                         const branchname = `backport-${pull_number}-to-${target}`;
                         console.log(`Start backport to ${branchname}`);
@@ -274,10 +274,11 @@ const execa_1 = __importDefault(__nccwpck_require__(5447));
  *
  * @param ref the sha, branchname, etc to fetch
  * @param pwd the root of the git repository
+ * @param depth the number of commits to fetch
  */
-function fetch(ref, pwd) {
+function fetch(ref, pwd, depth) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { exitCode } = yield git("fetch", ["origin", ref], pwd);
+        const { exitCode } = yield git("fetch", [`--depth=${depth}`, "origin", ref], pwd);
         if (exitCode !== 0) {
             throw new Error(`'git fetch origin ${ref}' failed with exit code ${exitCode}`);
         }
