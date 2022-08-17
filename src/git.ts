@@ -30,6 +30,7 @@ export async function push(branchname: string, pwd: string) {
 }
 
 async function git(command: string, args: string[], pwd: string) {
+  console.log(`git ${args.join(" ")}`);
   const child = execa("git", [command, ...args], {
     cwd: pwd,
     env: {
