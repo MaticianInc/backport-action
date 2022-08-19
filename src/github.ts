@@ -79,7 +79,6 @@ export class Github implements GithubApi {
   public async getFirstAndLastCommitSha(
     pull: PullRequest
   ): Promise<{ firstCommitSha: string; lastCommitSha: string | null }> {
-    console.log(`Retrieving the commits from pull request ${pull.number}`);
     const commits = await this.getCommits(pull);
     return {
       firstCommitSha: commits[0],
