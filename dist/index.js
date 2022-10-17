@@ -83,8 +83,8 @@ class Backport {
                 yield git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd, mainpr.commits + 1 // +1 in case this concerns a shallowly cloned repo
                 );
                 console.log("Determining first and last commit shas, so we can cherry-pick the commit range");
-                const { firstCommitSha, lastCommitSha } = yield this.github.getFirstAndLastCommitSha(mainpr);
-                console.log(`Found commits: ${firstCommitSha}..${lastCommitSha}`);
+                const commitShas = yield this.github.getCommits(mainpr);
+                console.log(`Found commits: ${commitShas}`);
                 for (const label of labels) {
                     console.log(`Working on label ${label.name}`);
                     // we are looking for labels like "backport stable/0.24"
@@ -122,7 +122,7 @@ class Backport {
                             continue;
                         }
                         try {
-                            yield git.cherryPick(firstCommitSha, lastCommitSha, this.config.pwd);
+                            yield git.cherryPick(commitShas, this.config.pwd);
                         }
                         catch (error) {
                             const message = this.composeMessageForBackportScriptFailure(target, 4, baseref, headref, branchname);
@@ -337,15 +337,12 @@ function checkout(branch, start, pwd) {
     });
 }
 exports.checkout = checkout;
-function cherryPick(firstCommitSha, lastCommitSha, pwd) {
+function cherryPick(commitShas, pwd) {
     return __awaiter(this, void 0, void 0, function* () {
-        const commits = lastCommitSha
-            ? `${firstCommitSha}..${lastCommitSha}`
-            : firstCommitSha;
-        const { exitCode } = yield git("cherry-pick", ["-x", commits], pwd);
+        const { exitCode } = yield git("cherry-pick", ["-x", ...commitShas], pwd);
         if (exitCode !== 0) {
             yield git("cherry-pick", ["--abort"], pwd);
-            throw new Error(`'git cherry-pick -x ${commits}' failed with exit code ${exitCode}`);
+            throw new Error(`'git cherry-pick -x ${commitShas}' failed with exit code ${exitCode}`);
         }
     });
 }
