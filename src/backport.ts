@@ -65,11 +65,13 @@ export class Backport {
         return; // nothing left to do here
       }
 
-      console.log("Fetching all the commits from the pull request");
+      console.log(
+        `Fetching all the commits from the pull request: ${mainpr.commits + 1}`
+      );
       await git.fetch(
         `refs/pull/${pull_number}/head`,
         this.config.pwd,
-        mainpr.commits
+        mainpr.commits + 1 // +1 in case this concerns a shallowly cloned repo
       );
 
       console.log(
@@ -77,6 +79,8 @@ export class Backport {
       );
       const { firstCommitSha, lastCommitSha } =
         await this.github.getFirstAndLastCommitSha(mainpr);
+
+      console.log(`Found commits: ${firstCommitSha}..${lastCommitSha}`);
 
       for (const label of labels) {
         console.log(`Working on label ${label.name}`);
