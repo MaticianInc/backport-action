@@ -79,10 +79,12 @@ class Backport {
                     console.log(`Nothing to backport: none of the labels match the backport pattern '${this.config.labels.pattern.source}'`);
                     return; // nothing left to do here
                 }
-                console.log("Fetching all the commits from the pull request");
-                yield git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd, mainpr.commits);
+                console.log(`Fetching all the commits from the pull request: ${mainpr.commits + 1}`);
+                yield git.fetch(`refs/pull/${pull_number}/head`, this.config.pwd, mainpr.commits + 1 // +1 in case this concerns a shallowly cloned repo
+                );
                 console.log("Determining first and last commit shas, so we can cherry-pick the commit range");
                 const { firstCommitSha, lastCommitSha } = yield this.github.getFirstAndLastCommitSha(mainpr);
+                console.log(`Found commits: ${firstCommitSha}..${lastCommitSha}`);
                 for (const label of labels) {
                     console.log(`Working on label ${label.name}`);
                     // we are looking for labels like "backport stable/0.24"
@@ -463,7 +465,6 @@ class Github {
     }
     getFirstAndLastCommitSha(pull) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`Retrieving the commits from pull request ${pull.number}`);
             const commits = yield this.getCommits(pull);
             return {
                 firstCommitSha: commits[0],
